@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Laundry On The Wire",
+    "artist": "HoliznaCC0",
+    "imageUrl": "/imgs/track_default_img_1.jpg",
+    "audioSrc": "./audio/Laundry_On_The_Wire.mp3"
+  },
+  {
+    "title": "Waves",
+    "artist": "HoliznaCC0",
+    "imageUrl": "/imgs/track_default_img_2.jpg",
+    "audioSrc": "./audio/Waves.mp3"
+  },
+  {
+    "title": "Rain On Me",
+    "artist": "JBlanked",
+    "imageUrl": "/imgs/track_default_img_3.jpg",
+    "audioSrc": "./audio/Rain_On_Me.mp3"
+  }
+]
