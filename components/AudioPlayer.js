@@ -7,6 +7,7 @@ import {
   FiPlayCircle,
   FiPauseCircle,
 } from "react-icons/fi";
+import { FaVolumeUp } from "react-icons/fa";
 
 function AudioPlayer({ tracks }) {
   // console.log(
@@ -27,10 +28,12 @@ function AudioPlayer({ tracks }) {
   //   audioRef.current
   // );
   const audioLoaded = useRef(false);
-  console.log(
-    "🚀 ~ file: AudioPlayer.js ~ line 30 ~ AudioPlayer ~ audioLoaded",
-    audioLoaded.current
-  );
+  // console.log(
+  //   "🚀 ~ file: AudioPlayer.js ~ line 30 ~ AudioPlayer ~ audioLoaded",
+  //   audioLoaded.current.volume
+  // );
+
+  const [volume, setVolume] = useState(100);
 
   const handleSkipBack = () => {
     if (trackIndex - 1 < 0) {
@@ -57,6 +60,11 @@ function AudioPlayer({ tracks }) {
     } else {
       setTrackIndex(0);
     }
+  };
+
+  const handleVolumeChange = (e) => {
+    audioRef.current.volume = e.target.value / 100;
+    console.log(e.target.value);
   };
 
   useEffect(() => {
@@ -88,12 +96,40 @@ function AudioPlayer({ tracks }) {
   }, [isPlaying]);
 
   return (
-    <div className="w-full h-full flex justify-center items-center bg-white">
-      <div className="flex flex-col w-[35vw] max-w-[35rem] min-w-[20rem] h-full max-h-[60rem] min-h-[40rem] rounded-[2.8rem] overflow-clip bg-black">
+    <div className="relative w-full h-full flex justify-center items-center">
+      <div
+        className="w-full h-full absolute z-10 bg-cover bg-center grayscale
+         
+         "
+        style={{
+          backgroundImage: `url(${track.imageUrl})`,
+        }}
+      />
+      <div
+        className="z-50 flex flex-col w-[35vw] max-w-[35rem] min-w-[20rem] h-full max-h-[60rem] min-h-[40rem] 
+      rounded-[2.8rem] overflow-clip
+      bg-black
+      "
+      >
         <div
-          className="w-full h-[70%] overflow-hidden bg-cover bg-center"
+          className="w-full h-[70%] overflow-hidden bg-cover bg-center brightness-90"
           style={{ backgroundImage: `url(${track.imageUrl})` }}
-        ></div>
+        >
+          <div className="group ">
+            <div className="hidden group-hover:block transition duration-1000 absolute left-[0%] bottom-[25%] ">
+              <input
+                type="range"
+                step={1}
+                min={0}
+                onChange={(e) => handleVolumeChange(e)}
+                className="translate-x-[-30%] translate-y-[-90%] rotate-[-90deg] appearance-none rounded-xl h-2 bg-gray-200 cursor-pointer"
+              />
+            </div>
+            <div className="left-[4%] bottom-[3%] absolute">
+              <FaVolumeUp className="w-[3em] h-[3em]" />
+            </div>
+          </div>
+        </div>
         <div className="text-[0.7rem] md:text-[1rem] flex flex-1 flex-col justify-around mt-3 ">
           <div>
             <div className="text-[2.5em] text-center">{track.title}</div>
@@ -101,11 +137,12 @@ function AudioPlayer({ tracks }) {
               {track.artist}
             </div>
           </div>
+
           {/* Controls */}
           <div className="flex flex-row justify-around mt-3">
             <div className="flex items-center">
               <FiSkipBack
-                className="w-[3em] h-[3em] hover:cursor-pointer"
+                className="w-[3em] h-[3em] hover:cursor-pointer stroke-1"
                 onClick={handleSkipBack}
               />
             </div>
@@ -113,19 +150,19 @@ function AudioPlayer({ tracks }) {
             <div className="mb-3">
               {isPlaying ? (
                 <FiPauseCircle
-                  className="w-[6em] h-[6em] hover:cursor-pointer"
+                  className="w-[6em] h-[6em] hover:cursor-pointer stroke-1"
                   onClick={handlePlay}
                 />
               ) : (
                 <FiPlayCircle
-                  className="w-[6em] h-[6em] hover:cursor-pointer"
+                  className="w-[6em] h-[6em] hover:cursor-pointer stroke-1"
                   onClick={handlePlay}
                 />
               )}
             </div>
             <div className="flex items-center">
               <FiSkipForward
-                className="w-[3em] h-[3em] hover:cursor-pointer"
+                className="w-[3em] h-[3em] hover:cursor-pointer stroke-1"
                 onClick={handleSkipForward}
               />
             </div>
