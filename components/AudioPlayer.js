@@ -7,7 +7,7 @@ import {
   FiPlayCircle,
   FiPauseCircle,
 } from "react-icons/fi";
-import { FaVolumeUp } from "react-icons/fa";
+import { FaVolumeUp, FaVolumeMute } from "react-icons/fa";
 
 function AudioPlayer({ tracks }) {
   // console.log(
@@ -18,15 +18,11 @@ function AudioPlayer({ tracks }) {
   const [trackIndex, setTrackIndex] = useState(0);
   const track = tracks[trackIndex];
   const [isPlaying, setIsPlaying] = useState(false);
+  const constraintRef = useRef();
 
-  // const audioRef = useRef(
-  //   typeof Audio !== "undefined" && new Audio(track.audioSrc)
-  // );
-  const audioRef = useRef(null);
-  // console.log(
-  //   "🚀 ~ file: AudioPlayer.js ~ line 22 ~ AudioPlayer ~ audioRef",
-  //   audioRef.current
-  // );
+  const audioRef = useRef();
+  const [mute, setMute] = useState(false);
+
   const audioLoaded = useRef(false);
   // console.log(
   //   "🚀 ~ file: AudioPlayer.js ~ line 30 ~ AudioPlayer ~ audioLoaded",
@@ -62,17 +58,29 @@ function AudioPlayer({ tracks }) {
     }
   };
 
-  const handleVolumeChange = (e) => {
-    audioRef.current.volume = e.target.value / 100;
-    console.log(e.target.value);
+  const handleVolumeChange = (val) => {
+    setVolume(val);
+    audioRef.current.volume = val / 100;
   };
 
+  const handleMute = () => {
+    setMute(!mute);
+  };
   useEffect(() => {
     audioRef.current = new Audio(track.audioSrc);
     return () => {
       audioRef.current.pause();
     };
   }, []);
+
+  useEffect(() => {
+    if (mute) {
+      setUnmute(false);
+      audioRef.current.volume = 0;
+    } else if (!mute) {
+      audioRef.current.volume = 1;
+    }
+  }, [mute]);
 
   useEffect(() => {
     audioRef.current.pause();
@@ -98,6 +106,7 @@ function AudioPlayer({ tracks }) {
   return (
     <div className="relative w-full h-full flex justify-center items-center">
       <div
+        ref={constraintRef}
         className="w-full h-full absolute z-10 bg-cover bg-center grayscale
          
          "
@@ -105,31 +114,55 @@ function AudioPlayer({ tracks }) {
           backgroundImage: `url(${track.imageUrl})`,
         }}
       />
-      <div
-        className="z-50 flex flex-col w-[35vw] max-w-[35rem] min-w-[20rem] h-full max-h-[60rem] min-h-[40rem] 
-      rounded-[2.8rem] overflow-clip
+
+      {/* Volume control */}
+      <div className="z-30">
+        {mute ? (
+          <div className="transition duration-1000 hover:cursor-pointer">
+            <div className="left-[0%] bottom-[3%] absolute hover:cursor-pointer">
+              <FaVolumeMute
+                className="w-[3em] h-[3em] translate-x-[70%]"
+                onClick={handleMute}
+              />
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="transition duration-1000 absolute left-[0%] bottom-[15%] hover:cursor-pointer">
+              <input
+                type="range"
+                step={1}
+                min={0}
+                defaultValue={100}
+                onChange={(e) => handleVolumeChange(e.target.value)}
+                className="translate-x-[-23%] translate-y-[-10%] rotate-[-90deg] appearance-none rounded-xl h-2 bg-gray-200 cursor-pointer"
+              />
+            </div>
+            <div className="left-[0%] bottom-[3%] absolute">
+              <FaVolumeUp
+                className="w-[3em] h-[3em] translate-x-[70%] cursor-pointer"
+                onClick={handleMute}
+              />
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* card */}
+      <motion.div
+        drag
+        dragConstraints={constraintRef}
+        className="z-50 flex flex-col w-[35vw] max-w-[35rem] min-w-[25rem] h-[10rem] md:h-full max-h-[60rem] min-h-[40rem] 
+      rounded-[2.1rem] overflow-clip
       bg-black
+      border-[0.3em]
+      border-black
       "
       >
         <div
           className="w-full h-[70%] overflow-hidden bg-cover bg-center brightness-90"
           style={{ backgroundImage: `url(${track.imageUrl})` }}
-        >
-          <div className="group ">
-            <div className="hidden group-hover:block transition duration-1000 absolute left-[0%] bottom-[25%] ">
-              <input
-                type="range"
-                step={1}
-                min={0}
-                onChange={(e) => handleVolumeChange(e)}
-                className="translate-x-[-30%] translate-y-[-90%] rotate-[-90deg] appearance-none rounded-xl h-2 bg-gray-200 cursor-pointer"
-              />
-            </div>
-            <div className="left-[4%] bottom-[3%] absolute">
-              <FaVolumeUp className="w-[3em] h-[3em]" />
-            </div>
-          </div>
-        </div>
+        ></div>
         <div className="text-[0.7rem] md:text-[1rem] flex flex-1 flex-col justify-around mt-3 ">
           <div>
             <div className="text-[2.5em] text-center">{track.title}</div>
@@ -168,7 +201,7 @@ function AudioPlayer({ tracks }) {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
