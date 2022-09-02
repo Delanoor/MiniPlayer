@@ -40,13 +40,6 @@ function AudioPlayer({ tracks }) {
   };
 
   const handlePlay = () => {
-    // if (isPlaying) {
-    //   audioRef.current.pause();
-    //   setIsPlaying(!isPlaying);
-    // } else {
-    //   audioRef.current.play();
-    //   setIsPlaying(!isPlaying);
-    // }
     setIsPlaying(!isPlaying);
   };
 
@@ -75,7 +68,6 @@ function AudioPlayer({ tracks }) {
 
   useEffect(() => {
     if (mute) {
-      setUnmute(false);
       audioRef.current.volume = 0;
     } else if (!mute) {
       audioRef.current.volume = 1;
@@ -104,7 +96,7 @@ function AudioPlayer({ tracks }) {
   }, [isPlaying]);
 
   return (
-    <div className="relative w-full h-full flex justify-center items-center">
+    <div className="relative w-full h-full flex justify-center items-center overflow-hidden">
       <div
         ref={constraintRef}
         className="w-full h-full absolute z-10 bg-cover bg-center grayscale
@@ -154,9 +146,13 @@ function AudioPlayer({ tracks }) {
         dragConstraints={constraintRef}
         className="z-50 flex flex-col w-[35vw] max-w-[35rem] min-w-[25rem] h-[10rem] md:h-full max-h-[60rem] min-h-[40rem] 
       rounded-[2.1rem] overflow-clip
-      bg-black
+      bg-transparent
       border-[0.3em]
-      border-black
+      border-blue-300
+      backdrop-blur-[9px]
+      hover:cursor-grab
+      active:cursor-grabbing
+      
       "
       >
         <div
@@ -175,7 +171,7 @@ function AudioPlayer({ tracks }) {
           <div className="flex flex-row justify-around mt-3">
             <div className="flex items-center">
               <FiSkipBack
-                className="w-[3em] h-[3em] hover:cursor-pointer stroke-1"
+                className="w-[3em] h-[3em] hover:cursor-pointer stroke-1 hover:stroke-2"
                 onClick={handleSkipBack}
               />
             </div>
@@ -183,19 +179,19 @@ function AudioPlayer({ tracks }) {
             <div className="mb-3">
               {isPlaying ? (
                 <FiPauseCircle
-                  className="w-[6em] h-[6em] hover:cursor-pointer stroke-1"
+                  className="w-[6em] h-[6em] hover:cursor-pointer stroke-[0.6] hover:stroke-[1.3]"
                   onClick={handlePlay}
                 />
               ) : (
                 <FiPlayCircle
-                  className="w-[6em] h-[6em] hover:cursor-pointer stroke-1"
+                  className="w-[6em] h-[6em] hover:cursor-pointer stroke-[0.6] hover:stroke-[1.3]"
                   onClick={handlePlay}
                 />
               )}
             </div>
             <div className="flex items-center">
               <FiSkipForward
-                className="w-[3em] h-[3em] hover:cursor-pointer stroke-1"
+                className="w-[3em] h-[3em] hover:cursor-pointer stroke-1 hover:stroke-2"
                 onClick={handleSkipForward}
               />
             </div>
