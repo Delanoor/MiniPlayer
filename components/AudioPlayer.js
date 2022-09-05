@@ -10,14 +10,10 @@ import {
 import { FaVolumeUp, FaVolumeMute } from "react-icons/fa";
 
 function AudioPlayer({ tracks }) {
-  // console.log(
-  //   "🚀 ~ file: AudioPlayer.js ~ line 2 ~ AudioPlayer ~ tracks",
-  //   tracks
-  // );
-
   const [trackIndex, setTrackIndex] = useState(0);
   const track = tracks[trackIndex];
   const [isPlaying, setIsPlaying] = useState(false);
+
   const constraintRef = useRef();
 
   const audioRef = useRef();
@@ -40,7 +36,7 @@ function AudioPlayer({ tracks }) {
   };
 
   const handlePlay = () => {
-    setIsPlaying(!isPlaying);
+    setIsPlaying((isPlaying) => !isPlaying);
   };
 
   const handleSkipForward = () => {
@@ -57,12 +53,23 @@ function AudioPlayer({ tracks }) {
   };
 
   const handleMute = () => {
-    setMute(!mute);
+    setMute((mute) => !mute);
   };
+
   useEffect(() => {
     audioRef.current = new Audio(track.audioSrc);
+
+    // keyboard events
+
+    const handleKeyboard = (e) => {
+      if (e.code === "Space") {
+        setIsPlaying((isPlaying) => !isPlaying);
+      }
+    };
+    window.addEventListener("keydown", handleKeyboard);
     return () => {
       audioRef.current.pause();
+      window.removeEventListener("keydown", handleKeyboard);
     };
   }, []);
 
