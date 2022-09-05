@@ -8,7 +8,14 @@ module.exports = {
     fontSize: {
       base: "1.6rem",
     },
-    extend: {},
+    extend: {
+      keyframes: {
+        rotateColor: {
+          from: { filter: "hue-rotate(0deg)" },
+          to: { filter: "hue-rotate(360deg)" },
+        },
+      },
+    },
   },
   plugins: [],
 };

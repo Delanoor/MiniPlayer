@@ -17,15 +17,24 @@ function AudioPlayer({ tracks }) {
   const constraintRef = useRef();
 
   const audioRef = useRef();
+  const [trackDuration, setTrackDuration] = useState(null);
+  const [trackProgress, setTrackProgress] = useState(0);
+  const trackProgressPercentageRef = useRef();
+  const currentTrackPercentage = trackDuration
+    ? (trackProgress / trackDuration) * 100
+    : "0%";
+
   const [mute, setMute] = useState(false);
 
-  const audioLoaded = useRef(false);
-  // console.log(
-  //   "🚀 ~ file: AudioPlayer.js ~ line 30 ~ AudioPlayer ~ audioLoaded",
-  //   audioLoaded.current.volume
-  // );
-
   const [volume, setVolume] = useState(100);
+
+  const startTimer = () => {
+    clearInterval(trackProgressPercentageRef.current);
+
+    trackProgressPercentageRef.current = setInterval(() => {
+      setTrackProgress(audioRef.current.currentTime);
+    }, [1000]);
+  };
 
   const handleSkipBack = () => {
     if (trackIndex - 1 < 0) {
@@ -56,8 +65,16 @@ function AudioPlayer({ tracks }) {
     setMute((mute) => !mute);
   };
 
+  const handleTrackProgress = (val) => {
+    audioRef.current.currentTime = val;
+    setTrackProgress(audioRef.current.currentTime);
+  };
+
   useEffect(() => {
     audioRef.current = new Audio(track.audioSrc);
+    audioRef.current.addEventListener("loadeddata", () => {
+      setTrackDuration(audioRef.current.duration);
+    });
 
     // keyboard events
 
@@ -89,6 +106,7 @@ function AudioPlayer({ tracks }) {
     if (isPlaying) {
       setIsPlaying(true);
       audioRef.current.play();
+      startTimer();
     } else {
       setIsPlaying(false);
     }
@@ -97,18 +115,23 @@ function AudioPlayer({ tracks }) {
   useEffect(() => {
     if (isPlaying) {
       audioRef.current.play();
+      startTimer();
     } else {
       audioRef.current.pause();
     }
   }, [isPlaying]);
 
   return (
-    <div className="relative w-full h-full flex justify-center items-center overflow-hidden">
+    <div className="relative w-full h-full flex justify-center items-center overflow-hidden text-neutral-800">
       <div
         ref={constraintRef}
-        className="w-full h-full absolute z-10 bg-cover bg-center grayscale
-         
-         "
+        className={`${
+          isPlaying
+            ? "bg-gradient-to-br from-indigo-500 via-purple-400 to-pink-500 animate-[rotateColor_20s_alternate_infinite]"
+            : "grayscale"
+        } w-full h-full absolute z-10 bg-cover bg-center  
+        
+        `}
         style={{
           backgroundImage: `url(${track.imageUrl})`,
         }}
@@ -132,14 +155,15 @@ function AudioPlayer({ tracks }) {
                 type="range"
                 step={1}
                 min={0}
+                value={volume}
                 defaultValue={100}
                 onChange={(e) => handleVolumeChange(e.target.value)}
-                className="translate-x-[-23%] translate-y-[-10%] rotate-[-90deg] appearance-none rounded-xl h-2 bg-gray-200 cursor-pointer"
+                className="translate-x-[-23%] translate-y-[-10%] rotate-[-90deg] appearance-none rounded-xl h-2 bg-white-200 cursor-pointer"
               />
             </div>
             <div className="left-[0%] bottom-[3%] absolute">
               <FaVolumeUp
-                className="w-[3em] h-[3em] translate-x-[70%] cursor-pointer"
+                className="w-[3em] h-[3em] translate-x-[70%] cursor-pointer fill-slate-50"
                 onClick={handleMute}
               />
             </div>
@@ -151,31 +175,50 @@ function AudioPlayer({ tracks }) {
       <motion.div
         drag
         dragConstraints={constraintRef}
-        className="z-50 flex flex-col w-[35vw] max-w-[35rem] min-w-[25rem] h-[10rem] md:h-full max-h-[60rem] min-h-[40rem] 
-      rounded-[2.1rem] overflow-clip
-      bg-transparent
-      border-[0.3em]
-      border-blue-300
+        className="z-50 flex flex-col w-[35vw] max-w-[35rem] min-w-[25rem] h-[15rem] md:h-full max-h-[60rem] min-h-[40rem] 
+      rounded-[3.1rem] overflow-clip
+      bg-white/30
+      backdrop-filter
       backdrop-blur-[9px]
       hover:cursor-grab
       active:cursor-grabbing
-      
       "
       >
-        <div
-          className="w-full h-[70%] overflow-hidden bg-cover bg-center brightness-90"
-          style={{ backgroundImage: `url(${track.imageUrl})` }}
-        ></div>
-        <div className="text-[0.7rem] md:text-[1rem] flex flex-1 flex-col justify-around mt-3 ">
+        <div className="flex w-full h-[70%] justify-center items-center overflow-hidden ">
+          {/* image */}
+          <div
+            className="w-[60%] aspect-square bg-cover bg-center rounded-[50%] drop-shadow-lg outline outline-neutral-100 outline-offset-[1em] outline-[0.13em]"
+            style={{
+              backgroundImage: `url(${track.imageUrl})`,
+            }}
+          />
+        </div>
+
+        {/* card body */}
+        <div className="text-[0.7rem] md:text-[1rem] flex flex-1 flex-col justify-around mt-3 bg-opacity-50">
           <div>
             <div className="text-[2.5em] text-center">{track.title}</div>
             <div className="text-[1.4em] text-center font-light">
               {track.artist}
             </div>
+
+            {/* trackProgress */}
+            <div className="w-full">
+              {currentTrackPercentage}
+              <input
+                type="range"
+                step="1"
+                min="0"
+                value={trackProgress}
+                max={trackDuration ? trackDuration : `${trackDuration}`}
+                onChange={(e) => handleTrackProgress(e.target.value)}
+                className="w-full"
+              />
+            </div>
           </div>
 
           {/* Controls */}
-          <div className="flex flex-row justify-around mt-3">
+          <div className="flex flex-row justify-around mt-3 text-white">
             <div className="flex items-center">
               <FiSkipBack
                 className="w-[3em] h-[3em] hover:cursor-pointer stroke-1 hover:stroke-2"
