@@ -32,6 +32,9 @@ function AudioPlayer({ tracks }) {
     clearInterval(trackProgressPercentageRef.current);
 
     trackProgressPercentageRef.current = setInterval(() => {
+      if (audioRef.current.ended) {
+        handleSkipForward();
+      }
       setTrackProgress(audioRef.current.currentTime);
     }, [1000]);
   };
@@ -127,14 +130,17 @@ function AudioPlayer({ tracks }) {
         ref={constraintRef}
         className={`${
           isPlaying
-            ? "bg-gradient-to-br from-indigo-500 via-purple-400 to-pink-500 animate-[rotateColor_20s_alternate_infinite]"
-            : "grayscale"
+            ? " animate-[rotateColor_50s_alternate_infinite]"
+            : `grayscale`
         } w-full h-full absolute z-10 bg-cover bg-center  
         
         `}
-        style={{
-          backgroundImage: `url(${track.imageUrl})`,
-        }}
+        style={
+          // isPlaying
+          //   ? { backgroundImage: "" }
+          //   :
+          { backgroundImage: `url(${track.imageUrl})` }
+        }
       />
 
       {/* Volume control */}
@@ -196,15 +202,14 @@ function AudioPlayer({ tracks }) {
 
         {/* card body */}
         <div className="text-[0.7rem] md:text-[1rem] flex flex-1 flex-col justify-around mt-3 bg-opacity-50">
-          <div>
+          <div className="">
             <div className="text-[2.5em] text-center">{track.title}</div>
-            <div className="text-[1.4em] text-center font-light">
+            <div className="text-[1.4em] text-center font-light mb-3">
               {track.artist}
             </div>
 
             {/* trackProgress */}
             <div className="w-full">
-              {currentTrackPercentage}
               <input
                 type="range"
                 step="1"
@@ -218,7 +223,7 @@ function AudioPlayer({ tracks }) {
           </div>
 
           {/* Controls */}
-          <div className="flex flex-row justify-around mt-3 text-white">
+          <div className="flex flex-row justify-around mt-3 text-white mb-3">
             <div className="flex items-center">
               <FiSkipBack
                 className="w-[3em] h-[3em] hover:cursor-pointer stroke-1 hover:stroke-2"
