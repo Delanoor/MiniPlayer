@@ -77,6 +77,8 @@ function AudioPlayer({ tracks }) {
     audioRef.current = new Audio(track.audioSrc);
     audioRef.current.addEventListener("loadeddata", () => {
       setTrackDuration(audioRef.current.duration);
+
+      console.log(audioRef.current.duration);
     });
 
     // keyboard events
